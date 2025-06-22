@@ -21,7 +21,7 @@
         <section>
             <h2>一些可能有用的程式區！</h2>
             <div class="button-container">
-                <a class="link-button" href="basic-python.html"> 基礎Python </a>
+                <a class="link-button" href="python.html"> 基礎Python </a>
                 <a class="link-button" href="tools.html"> 基礎C++ </a>
                 <a class="link-button" href="linux.html"> 基礎Linux指令 </a>
                 <a class="link-button" href="tools.html"> 資料結構 </a>
