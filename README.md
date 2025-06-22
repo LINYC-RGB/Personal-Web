@@ -31,7 +31,6 @@
         <section>
             <h2>聯絡方式</h2>
             <p>Email：linyc@example.com</p>
-            <p>GitHub：<a href="https://github.com/LINYC-RGB" target="_blank">LINYC-RGB</a></p>
         </section>
     </main>
 
@@ -41,10 +40,3 @@
 </body>
 </html>
 
-
-<footer>
-    <p>© 2025 林小明. 保留所有權利。</p>
-</footer>
-
-</body>
-</html>
