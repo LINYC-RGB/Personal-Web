@@ -2,7 +2,6 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>我的自我介紹網站</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,9 +21,11 @@
         <section>
             <h2>一些可能有用的程式區！</h2>
             <div class="button-container">
-                <a class="link-button" href="basic-python.html">基礎Python</a>
-                <a class="link-button" href="tools.html"> 基礎C++</a>
-                <a class="link-button" href="tools.html"> 資料結構</a>
+                <a class="link-button" href="basic-python.html"> 基礎Python </a>
+                <a class="link-button" href="tools.html"> 基礎C++ </a>
+                <a class="link-button" href="linux.html"> 基礎Linux指令 </a>
+                <a class="link-button" href="tools.html"> 資料結構 </a>
+                <a class="link-button" href="tools.html"> 我一些其他的怪東西 </a>
             </div>
         </section>
 
