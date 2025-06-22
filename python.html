@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>基礎 Python 運算</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1, h2 {
+            color: #0066cc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #e6f2ff;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-left: 5px solid #007acc;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>基礎 Python 運算</h1>
+
+    <h2>一、數學運算符（Arithmetic Operators）</h2>
+    <table>
+        <tr><th>運算符</th><th>說明</th><th>範例</th><th>結果</th></tr>
+        <tr><td>+</td><td>加法</td><td>3 + 2</td><td>5</td></tr>
+        <tr><td>-</td><td>減法</td><td>5 - 3</td><td>2</td></tr>
+        <tr><td>*</td><td>乘法</td><td>4 * 2</td><td>8</td></tr>
+        <tr><td>/</td><td>除法（浮點數）</td><td>5 / 2</td><td>2.5</td></tr>
+        <tr><td>//</td><td>整除</td><td>5 // 2</td><td>2</td></tr>
+        <tr><td>%</td><td>取餘數</td><td>5 % 2</td><td>1</td></tr>
+        <tr><td>**</td><td>次方</td><td>2 ** 3</td><td>8</td></tr>
+    </table>
+
+    <h2>二、比較運算符（Comparison Operators）</h2>
+    <table>
+        <tr><th>運算符</th><th>說明</th><th>範例</th><th>結果</th></tr>
+        <tr><td>==</td><td>等於</td><td>5 == 5</td><td>True</td></tr>
+        <tr><td>!=</td><td>不等於</td><td>3 != 2</td><td>True</td></tr>
+        <tr><td>></td><td>大於</td><td>4 > 2</td><td>True</td></tr>
+        <tr><td><</td><td>小於</td><td>4 < 2</td><td>False</td></tr>
+        <tr><td>>=</td><td>大於等於</td><td>5 >= 5</td><td>True</td></tr>
+        <tr><td><=</td><td>小於等於</td><td>3 <= 5</td><td>True</td></tr>
+    </table>
+
+    <h2>三、邏輯運算符（Logical Operators）</h2>
+    <table>
+        <tr><th>運算符</th><th>說明</th><th>範例</th><th>結果</th></tr>
+        <tr><td>and</td><td>邏輯且</td><td>True and False</td><td>False</td></tr>
+        <tr><td>or</td><td>邏輯或</td><td>True or False</td><td>True</td></tr>
+        <tr><td>not</td><td>邏輯非</td><td>not True</td><td>False</td></tr>
+    </table>
+
+    <h2>範例：</h2>
+    <pre>
+age = 20
+has_id = True
+
+if age >= 18 and has_id:
+    print("可以進入")
+else:
+    print("禁止進入")
+    </pre>
+
+    <h2>四、常用邏輯結構</h2>
+
+    <h3>if 判斷式：</h3>
+    <pre>
+x = 10
+if x > 0:
+    print("正數")
+elif x == 0:
+    print("零")
+else:
+    print("負數")
+    </pre>
+
+    <h3>for 迴圈：</h3>
+    <pre>
+for i in range(5):
+    print(i)  # 輸出 0~4
+    </pre>
+
+    <h3>while 迴圈：</h3>
+    <pre>
+count = 0
+while count < 3:
+    print("計數：", count)
+    count += 1
+    </pre>
+
+    <h3>三元運算子（條件運算式）：</h3>
+    <pre>
+x = 5
+result = "正數" if x > 0 else "不是正數"
+print(result)
+    </pre>
+
+    <h2>五、運算優先順序（從高到低）</h2>
+    <ol>
+        <li>() 括號</li>
+        <li>** 次方</li>
+        <li>+ -（正負號）</li>
+        <li>* / // %</li>
+        <li>+ -（加減法）</li>
+        <li>== != > < >= <=</li>
+        <li>not</li>
+        <li>and</li>
+        <li>or</li>
+    </ol>
+
+</body>
+</html>
