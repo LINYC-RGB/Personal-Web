@@ -25,7 +25,7 @@
                 <a class="link-button" href="tools.html"> 基礎C++ </a>
                 <a class="link-button" href="linux.html"> 基礎Linux指令 </a>
                 <a class="link-button" href="tools.html"> 資料結構 </a>
-                <a class="link-button" href="tools.html"> 我一些其他的怪東西 </a>
+                <a class="link-button" href="tools.html"> 一些其他的怪東西 </a>
             </div>
         </section>
 
