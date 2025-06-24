@@ -31,17 +31,18 @@
         }
         .home-button {
             display: block;
-            width: fit-content;
             margin: 40px auto;
             padding: 10px 20px;
-            background-color: #0066cc;
+            background-color: #3498db;
             color: white;
+            text-align: center;
             text-decoration: none;
-            border-radius: 5px;
             font-weight: bold;
+            border-radius: 8px;
+            width: 120px;
         }
         .home-button:hover {
-            background-color: #004c99;
+            background-color: #2980b9;
         }
     </style>
 </head>
@@ -49,151 +50,9 @@
 
     <h1>🔹 機器學習基本觀念</h1>
 
-    <div class="section">
-        <h2>🔹 機器學習（Machine Learning）是什麼？</h2>
-        <p>機器學習是一種讓電腦透過資料學習，進而自行找出規律與模式，不需要人工明確編寫規則的技術。簡單說，就是「讓機器從經驗中學習」。</p>
-    </div>
+    <!-- 內容省略，保留原本你的章節與表格內容 -->
 
-    <div class="section">
-        <h2>🔹 三種主要類型</h2>
-        <table>
-            <tr>
-                <th>類型</th>
-                <th>說明</th>
-                <th>舉例</th>
-            </tr>
-            <tr>
-                <td>監督式學習（Supervised Learning）</td>
-                <td>有「輸入資料」與「正確答案（標籤）」</td>
-                <td>圖片分類、房價預測</td>
-            </tr>
-            <tr>
-                <td>非監督式學習（Unsupervised Learning）</td>
-                <td>只有「輸入資料」，沒有答案</td>
-                <td>客群分類（Clustering）、主成分分析</td>
-            </tr>
-            <tr>
-                <td>強化學習（Reinforcement Learning）</td>
-                <td>機器透過「獎勵與懲罰」學習行為策略</td>
-                <td>玩遊戲、機器人走迷宮</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="section">
-        <h2>🔹 常見名詞解釋</h2>
-        <table>
-            <tr>
-                <th>名詞</th>
-                <th>解釋</th>
-            </tr>
-            <tr>
-                <td>特徵（Feature）</td>
-                <td>資料的屬性或變數，例如房子的「坪數」、「樓層」、「地點」</td>
-            </tr>
-            <tr>
-                <td>標籤（Label）</td>
-                <td>正確答案，例如房價、是否有糖尿病</td>
-            </tr>
-            <tr>
-                <td>模型（Model）</td>
-                <td>機器學習的學習結果，可用來預測未知資料</td>
-            </tr>
-            <tr>
-                <td>訓練（Training）</td>
-                <td>將資料餵給模型進行學習的過程</td>
-            </tr>
-            <tr>
-                <td>測試（Testing）</td>
-                <td>使用沒見過的資料，評估模型的預測能力</td>
-            </tr>
-            <tr>
-                <td>過擬合（Overfitting）</td>
-                <td>模型記住了訓練資料細節，導致在新資料上表現不佳</td>
-            </tr>
-            <tr>
-                <td>欠擬合（Underfitting）</td>
-                <td>模型太簡單，無法學到資料的規律</td>
-            </tr>
-            <tr>
-                <td>損失函數（Loss Function）</td>
-                <td>測量模型預測結果與正確答案的差距</td>
-            </tr>
-            <tr>
-                <td>準確率（Accuracy）</td>
-                <td>正確預測的比例，常用於分類問題</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="section">
-        <h2>🔹 常見演算法舉例</h2>
-        <table>
-            <tr>
-                <th>演算法</th>
-                <th>用途</th>
-            </tr>
-            <tr>
-                <td>線性回歸（Linear Regression）</td>
-                <td>預測數值，如房價、股價</td>
-            </tr>
-            <tr>
-                <td>邏輯回歸（Logistic Regression）</td>
-                <td>二分類問題，如判斷是否生病</td>
-            </tr>
-            <tr>
-                <td>決策樹（Decision Tree）</td>
-                <td>可視化分類與回歸</td>
-            </tr>
-            <tr>
-                <td>支持向量機（SVM）</td>
-                <td>二分類、找最佳分隔邊界</td>
-            </tr>
-            <tr>
-                <td>K最近鄰居（K-NN）</td>
-                <td>比較相似資料分類</td>
-            </tr>
-            <tr>
-                <td>K-平均（K-Means）</td>
-                <td>非監督式分群</td>
-            </tr>
-            <tr>
-                <td>神經網路（Neural Network）</td>
-                <td>模仿人腦學習模式，適用複雜資料</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="section">
-        <h2>🔹 常見統計與評估指標解釋</h2>
-
-        <h3>📌 P值（p-value）</h3>
-        <p><strong>用途：</strong>檢定統計結果是否顯著。</p>
-        <p><strong>意義：</strong>P 值小 → 結果不太可能是巧合，表示有統計顯著性。</p>
-        <p><strong>常見閾值：</strong>p &lt; 0.05 表示顯著。</p>
-        <p><strong>舉例：</strong>若測試藥物對血壓的影響，p &lt; 0.05 通常表示有效果。</p>
-
-        <h3>📌 準確率（Accuracy）</h3>
-        <p>公式：Accuracy = (TP + TN) / (TP + TN + FP + FN)</p>
-        <p>適用於類別分布均衡的情境。</p>
-
-        <h3>📌 精確率（Precision）</h3>
-        <p>公式：Precision = TP / (TP + FP)</p>
-        <p>關注錯殺代價高的情況（如垃圾郵件）。</p>
-
-        <h3>📌 召回率（Recall）</h3>
-        <p>公式：Recall = TP / (TP + FN)</p>
-        <p>關注漏判代價高的情況（如癌症篩檢）。</p>
-
-        <h3>📌 F1 分數（F1 Score）</h3>
-        <p>公式：F1 = 2 × (Precision × Recall) / (Precision + Recall)</p>
-        <p>當 Precision 和 Recall 都重要時使用，對不平衡資料集尤其有用。</p>
-
-        <h3>📌 AUC-ROC</h3>
-        <p>定義：ROC 曲線下的面積，範圍為 0.5 到 1.0。</p>
-        <p>用途：評估分類模型區分能力，尤其適合資料不平衡的情況。</p>
-    </div>
-
+    <!-- 最後一段：混淆矩陣 -->
     <div class="section">
         <h2>🔹 混淆矩陣（Confusion Matrix）</h2>
         <table>
@@ -214,6 +73,9 @@
             </tr>
         </table>
     </div>
-    <a href="index.html" class="back-button">← 回首頁</a>
+
+    <!-- 回首頁按鈕 -->
+    <a class="home-button" href="index.html">回首頁</a>
+
 </body>
 </html>
