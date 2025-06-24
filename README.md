@@ -19,19 +19,20 @@
         </section>
 
         <section>
-            <h2>一些可能有用的程式區！</h2>
+            <h2>一些對新手可能有用的程式區</h2>
             <div class="button-container">
                 <a class="link-button" href="python.html"> 基礎Python </a>
                 <a class="link-button" href="tools.html"> 基礎C++ </a>
                 <a class="link-button" href="linux.html"> 基礎Linux指令 </a>
-                <a class="link-button" href="tools.html"> 資料結構 </a>
+                <a class="link-button" href="linux.html"> 基礎機器學習 </a>
+                <a class="link-button" href="tools.html"> 資料結構(範例程式) </a>
                 <a class="link-button" href="tools.html"> 一些其他的怪東西 </a>
             </div>
         </section>
 
         <section>
             <h2>聯絡方式</h2>
-            <p>Email：linyc@example.com</p>
+            <p>Email：10310704aaa@gmail.com</p>
         </section>
     </main>
 
