@@ -61,13 +61,11 @@
       margin-top: 10px;
       font-weight: bold;
     }
-    #note-values {
+    #note-values, #note-indicator, #current-difficulty {
       margin-top: 10px;
       font-size: 14px;
     }
     #note-indicator {
-      margin-top: 10px;
-      font-size: 14px;
       font-weight: bold;
       color: #007bff;
     }
@@ -102,6 +100,7 @@
 
   <div id="game-container" style="display:none;">
     <div id="timer">時間：00:00</div>
+    <div id="current-difficulty"></div>
     <button onclick="toggleNote()">切換筆記模式</button>
     <div id="note-indicator">筆記模式：關閉</div>
     <div id="sudoku-board"></div>
@@ -121,20 +120,27 @@
       hard: [21, 25],
       expert: [17, 20]
     };
+    const difficultyLabel = {
+      easy: "入門",
+      normal: "初級",
+      medium: "中級",
+      hard: "高級",
+      expert: "超級"
+    };
 
-    let board = [];
-    let solution = [];
-    let selectedCell = null;
-    let notesMode = false;
-    let timerStarted = false;
-    let timerInterval;
-    let seconds = 0;
+    let board = [], solution = [], selectedCell = null;
+    let notesMode = false, timerStarted = false;
+    let timerInterval, seconds = 0;
+    let currentDifficulty = "";
 
     function startGame() {
       document.getElementById('menu').style.display = 'none';
       document.getElementById('game-container').style.display = 'block';
 
       let difficulty = document.getElementById("difficulty").value;
+      currentDifficulty = difficultyLabel[difficulty];
+      document.getElementById("current-difficulty").textContent = `目前難度：${currentDifficulty}`;
+
       let [min, max] = difficultyMap[difficulty];
       let clues = Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -221,10 +227,9 @@
       document.querySelectorAll('.cell').forEach(c => {
         c.classList.remove("highlight", "same-number", "invalid");
       });
-
+      selectedCell = cell;
       let r = parseInt(cell.dataset.row);
       let c = parseInt(cell.dataset.col);
-      selectedCell = cell;
 
       document.querySelectorAll('.cell').forEach(cel => {
         let row = parseInt(cel.dataset.row);
@@ -236,77 +241,16 @@
       });
 
       updateNoteHint(cell);
-      updateNumberPad();
-    }
-
-    function enterNumber(num) {
-      if (!selectedCell || selectedCell.classList.contains("fixed")) return;
-      let r = parseInt(selectedCell.dataset.row);
-      let c = parseInt(selectedCell.dataset.col);
-      const used = getUsedNumbers(r, c);
-
-      if (used.has(num)) return;
-
-      if (notesMode) {
-        let note = selectedCell.getAttribute("data-note") || "";
-        let notes = note.split("").map(n => parseInt(n)).filter(n => n >= 1 && n <= 9);
-        if (notes.includes(num)) {
-          notes = notes.filter(n => n !== num);
-        } else {
-          notes.push(num);
-          notes.sort((a,b) => a - b);
-        }
-        selectedCell.setAttribute("data-note", notes.join(""));
-        selectedCell.textContent = "";
-        board[r][c] = 0;
-        document.getElementById("note-values").textContent = `此格可能數值：${notes.join(", ")}`;
-      } else {
-        selectedCell.textContent = num;
-        selectedCell.removeAttribute("data-note");
-        board[r][c] = num;
-        checkConflicts(r, c, num);
-      }
-    }
-
-    function clearSelectedCell() {
-      if (!selectedCell || selectedCell.classList.contains("fixed")) return;
-
-      const r = parseInt(selectedCell.dataset.row);
-      const c = parseInt(selectedCell.dataset.col);
-
-      selectedCell.textContent = "";
-      selectedCell.removeAttribute("data-note");
-      board[r][c] = 0;
-
-      document.getElementById("note-values").textContent = "此格可能數值：";
-      updateNumberPad();
-    }
-
-    function getUsedNumbers(row, col) {
-      const used = new Set();
-      for (let i = 0; i < 9; i++) {
-        if (board[row][i] !== 0) used.add(board[row][i]);
-        if (board[i][col] !== 0) used.add(board[i][col]);
-      }
-      let br = Math.floor(row / 3) * 3;
-      let bc = Math.floor(col / 3) * 3;
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          let val = board[br + i][bc + j];
-          if (val !== 0) used.add(val);
-        }
-      }
-      return used;
+      renderNumberPad();
     }
 
     function renderNumberPad() {
       const pad = document.getElementById("number-pad");
       pad.innerHTML = '';
-      const row = selectedCell ? parseInt(selectedCell.dataset.row) : null;
-      const col = selectedCell ? parseInt(selectedCell.dataset.col) : null;
-      const used = (selectedCell && row !== null && col !== null)
-        ? getUsedNumbers(row, col)
-        : new Set();
+      const r = selectedCell ? parseInt(selectedCell.dataset.row) : null;
+      const c = selectedCell ? parseInt(selectedCell.dataset.col) : null;
+      const used = selectedCell && !selectedCell.classList.contains("fixed") ? getUsedNumbers(r, c) : new Set([...Array(9).keys()].map(n => n + 1));
+
       for (let i = 1; i <= 9; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
@@ -320,14 +264,64 @@
       }
     }
 
-    function updateNumberPad() {
+    function enterNumber(num) {
+      if (!selectedCell || selectedCell.classList.contains("fixed")) return;
+      let r = parseInt(selectedCell.dataset.row);
+      let c = parseInt(selectedCell.dataset.col);
+      const used = getUsedNumbers(r, c);
+
+      if (used.has(num)) return;
+
+      if (notesMode) {
+        let note = selectedCell.getAttribute("data-note") || "";
+        let notes = note.split("").map(n => parseInt(n)).filter(n => n >= 1 && n <= 9);
+        if (!notes.includes(num)) notes.push(num);
+        selectedCell.setAttribute("data-note", notes.sort().join(""));
+        selectedCell.textContent = "";
+        board[r][c] = 0;
+        document.getElementById("note-values").textContent = `此格可能數值：${notes.join(", ")}`;
+      } else {
+        selectedCell.textContent = num;
+        selectedCell.removeAttribute("data-note");
+        board[r][c] = num;
+        checkConflicts(r, c, num);
+      }
+
       renderNumberPad();
+    }
+
+    function clearSelectedCell() {
+      if (!selectedCell || selectedCell.classList.contains("fixed")) return;
+      const r = parseInt(selectedCell.dataset.row);
+      const c = parseInt(selectedCell.dataset.col);
+      selectedCell.textContent = "";
+      selectedCell.removeAttribute("data-note");
+      board[r][c] = 0;
+      document.getElementById("note-values").textContent = "此格可能數值：";
+      renderNumberPad();
+    }
+
+    function getUsedNumbers(row, col) {
+      const used = new Set();
+      for (let i = 0; i < 9; i++) {
+        if (board[row][i] !== 0) used.add(board[row][i]);
+        if (board[i][col] !== 0) used.add(board[i][col]);
+      }
+      const br = Math.floor(row / 3) * 3;
+      const bc = Math.floor(col / 3) * 3;
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          const val = board[br + i][bc + j];
+          if (val !== 0) used.add(val);
+        }
+      }
+      return used;
     }
 
     function toggleNote() {
       notesMode = !notesMode;
       document.getElementById("note-indicator").textContent = "筆記模式：" + (notesMode ? "開啟" : "關閉");
-      updateNumberPad();
+      renderNumberPad();
     }
 
     function updateNoteHint(cell) {
@@ -355,18 +349,19 @@
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
           if (board[r][c] != solution[r][c]) {
-            document.getElementById('result-message').textContent = "❌請檢查紅色格子";
+            document.getElementById('result-message').textContent = "❌ 答錯囉！請檢查紅色格子";
             return;
           }
         }
       }
       stopTimer();
-      document.getElementById('result-message').textContent = `🎉 恭喜完成！耗時：${formatTime(seconds)}`;
+      document.getElementById('result-message').textContent =
+        `🎉 恭喜完成！難度：${currentDifficulty}，耗時：${formatTime(seconds)}`;
     }
 
     function shuffle(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
       return arr;
@@ -392,8 +387,8 @@
     }
 
     function formatTime(secs) {
-      let m = Math.floor(secs / 60).toString().padStart(2, '0');
-      let s = (secs % 60).toString().padStart(2, '0');
+      const m = Math.floor(secs / 60).toString().padStart(2, '0');
+      const s = (secs % 60).toString().padStart(2, '0');
       return `${m}:${s}`;
     }
 
@@ -402,6 +397,7 @@
       enterNumber(parseInt(e.key));
     });
   </script>
+
   <a href="index.html" class="back-button">回首頁</a>
 </body>
 </html>
