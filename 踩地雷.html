@@ -1,3 +1,4 @@
+<!-- ⚠️記得儲存為 .html 檔案再用瀏覽器打開測試 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +50,10 @@
     #home {
       margin-top: 20px;
     }
+    #timer {
+      font-weight: bold;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -60,12 +65,13 @@
     若按下0則會自動展開連續的0區域以及周圍的數字格子。
   </div>
   <div id="controls">
-    Rows: <input type="number" id="列數" value="10" min="1" max="30" />
-    Cols: <input type="number" id="行數" value="10" min="1" max="30" />
-    Mines: <input type="number" id="地雷數" value="10" min="1" />
+    Rows: <input type="number" id="rows" value="10" min="1" max="30" />
+    Cols: <input type="number" id="cols" value="10" min="1" max="30" />
+    Mines: <input type="number" id="mines" value="10" min="1" />
     <button onclick="startGame()">Start New Game</button>
   </div>
   <div id="mine-count">Mines left: <span id="mine-counter">0</span></div>
+  <div id="timer">Time: <span id="time">0</span> seconds</div>
   <div id="board"></div>
   <div id="home">
     <a href="index.html">回首頁</a>
@@ -78,12 +84,19 @@
     let rows = 10, cols = 10, mineCount = 10;
     let firstClick = true;
     let revealedCount = 0;
+    let startTime = null;
+    let timerInterval = null;
 
     function startGame() {
       rows = Math.min(30, parseInt(document.getElementById('rows').value));
       cols = Math.min(30, parseInt(document.getElementById('cols').value));
       mineCount = parseInt(document.getElementById('mines').value);
       document.getElementById('mine-counter').textContent = mineCount;
+      document.getElementById('time').textContent = 0;
+
+      clearInterval(timerInterval);
+      startTime = null;
+
       mineLocations.clear();
       flaggedCells.clear();
       board = [];
@@ -180,6 +193,7 @@
           clearBoardMines();
           placeMines(r, c);
         }
+        startTimer();
         firstClick = false;
       }
 
@@ -188,6 +202,7 @@
         cell.textContent = "💣";
         alert("Game Over!");
         revealAll();
+        stopTimer();
         return;
       }
 
@@ -247,9 +262,23 @@
     function checkWin() {
       const totalSafe = rows * cols - mineCount;
       if (revealedCount === totalSafe) {
-        alert("成功排雷！");
+        stopTimer();
+        const totalTime = Math.floor((Date.now() - startTime) / 1000);
+        alert(`成功排雷！耗時 ${totalTime} 秒`);
         revealAll();
       }
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const seconds = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('time').textContent = seconds;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
     }
 
     startGame();
