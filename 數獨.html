@@ -20,27 +20,40 @@
       justify-content: center;
       margin: 20px auto;
     }
-    .cell {
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
-      border: 1px solid #ccc;
-      text-align: center;
-      line-height: 40px;
-      background: white;
-      position: relative;
-      cursor: pointer;
-    }
-    .cell.fixed {
-      background: #e0e0e0;
-      font-weight: bold;
-    }
-    .cell.highlight {
-      background: #cfe8fc;
-    }
-    .cell.same-number {
-      background: #ffe4b2;
-    }
+   .cell {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  border: 1px solid #ccc;
+  text-align: center;
+  line-height: 40px;
+  background: white;
+  position: relative;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* 加上粗邊界區分 3x3 宮 */
+.cell:nth-child(3n+1) {
+  border-left: 2px solid #000;
+}
+.cell:nth-child(-n+9),
+.cell:nth-child(n+73) {
+  border-top: 2px solid #000;
+}
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+  border-bottom: 2px solid #000;
+}
+.cell:nth-child(9n+1),
+.cell:nth-child(9n+4),
+.cell:nth-child(9n+7) {
+  border-left: 2px solid #000;
+}
+.cell:nth-child(9n) {
+  border-right: 2px solid #000;
+}
+
     .notes {
       font-size: 10px;
       line-height: 13px;
