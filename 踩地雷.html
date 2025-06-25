@@ -16,6 +16,14 @@
       font-weight: bold;
       margin-bottom: 10px;
     }
+    #instructions {
+      margin: 10px auto;
+      max-width: 500px;
+      font-size: 14px;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
+    }
     #board {
       display: grid;
       justify-content: center;
@@ -45,6 +53,11 @@
 </head>
 <body>
   <h1>Minesweeper</h1>
+  <div id="instructions">
+    每個數字代表其周圍8格範圍內的地雷數，<br>
+    對空格按下滑鼠右鍵可標記地雷。<br>
+    若按下0則會自動展開連續的0區域以及周圍的數字格子。
+  </div>
   <div id="controls">
     Rows: <input type="number" id="rows" value="10" min="1" max="30" />
     Cols: <input type="number" id="cols" value="10" min="1" max="30" />
@@ -54,7 +67,7 @@
   <div id="mine-count">Mines left: <span id="mine-counter">0</span></div>
   <div id="board"></div>
   <div id="home">
-    <a href="index.html">回首頁</a>
+    <a href="/">← 回首頁</a>
   </div>
 
   <script>
@@ -80,7 +93,7 @@
       const boardDiv = document.getElementById('board');
       boardDiv.innerHTML = '';
       boardDiv.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
-      board = new Array(rows).fill().map(() => new Array(cols).fill({ revealed: false, mine: false, number: 0 }));
+      board = new Array(rows).fill().map(() => new Array(cols).fill().map(() => ({ revealed: false, mine: false, number: 0 })));
     }
 
     function placeMines() {
@@ -89,7 +102,7 @@
         const r = Math.floor(Math.random() * rows);
         const c = Math.floor(Math.random() * cols);
         if (!board[r][c].mine) {
-          board[r][c] = { ...board[r][c], mine: true };
+          board[r][c].mine = true;
           mineLocations.add(`${r},${c}`);
           placed++;
           updateNumbers(r, c);
@@ -103,7 +116,7 @@
           const nr = r + dr;
           const nc = c + dc;
           if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !board[nr][nc].mine) {
-            board[nr][nc] = { ...board[nr][nc], number: board[nr][nc].number + 1 };
+            board[nr][nc].number++;
           }
         }
       }
@@ -145,23 +158,38 @@
       const r = parseInt(cell.dataset.row);
       const c = parseInt(cell.dataset.col);
       if (board[r][c].revealed || flaggedCells.has(`${r},${c}`)) return;
-      board[r][c].revealed = true;
-      cell.classList.add('revealed');
       if (board[r][c].mine) {
+        cell.classList.add('revealed');
         cell.textContent = "💣";
         alert("Game Over!");
         revealAll();
         return;
       }
-      if (board[r][c].number > 0) {
-        cell.textContent = board[r][c].number;
-      } else {
-        for (let dr = -1; dr <= 1; dr++) {
-          for (let dc = -1; dc <= 1; dc++) {
-            const nr = r + dr, nc = c + dc;
-            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-              const neighbor = document.querySelector(`[data-row='${nr}'][data-col='${nc}']`);
-              if (neighbor) revealCell(neighbor);
+      floodReveal(r, c);
+    }
+
+    function floodReveal(r, c) {
+      const queue = [[r, c]];
+      const visited = new Set();
+
+      while (queue.length > 0) {
+        const [cr, cc] = queue.shift();
+        const key = `${cr},${cc}`;
+        if (visited.has(key) || cr < 0 || cr >= rows || cc < 0 || cc >= cols) continue;
+
+        const cell = document.querySelector(`[data-row='${cr}'][data-col='${cc}']`);
+        if (!cell || board[cr][cc].revealed) continue;
+
+        board[cr][cc].revealed = true;
+        cell.classList.add('revealed');
+        cell.textContent = board[cr][cc].number > 0 ? board[cr][cc].number : '';
+        visited.add(key);
+
+        if (board[cr][cc].number === 0) {
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const nr = cr + dr, nc = cc + dc;
+              queue.push([nr, nc]);
             }
           }
         }
