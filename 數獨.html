@@ -18,7 +18,7 @@
       grid-template-rows: repeat(9, 40px);
       justify-content: center;
       margin: 20px auto;
-      border: 3px solid #000;
+      border-collapse: collapse;
     }
     .cell {
       width: 40px;
@@ -32,14 +32,11 @@
       box-sizing: border-box;
       border: 1px solid #ccc;
     }
-    .cell:nth-child(9n+1) { border-left: 3px solid #000; }
-    .cell:nth-child(9n)   { border-right: 3px solid #000; }
-    .cell:nth-child(-n+9) { border-top: 3px solid #000; }
-    .cell:nth-child(n+19):nth-child(-n+27),
-    .cell:nth-child(n+46):nth-child(-n+54),
-    .cell:nth-child(n+73):nth-child(-n+81) {
-      border-bottom: 3px solid #000;
-    }
+    .cell.border-top { border-top: 3px solid black; }
+    .cell.border-left { border-left: 3px solid black; }
+    .cell.border-right { border-right: 3px solid black; }
+    .cell.border-bottom { border-bottom: 3px solid black; }
+
     .cell.fixed {
       background: #e0e0e0;
       font-weight: bold;
@@ -51,21 +48,10 @@
     .cell.same-number {
       background: #ffe4b2;
     }
-    .cell.notes {
-      font-size: 10px;
-      line-height: 13px;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      text-align: left;
-      width: 100%;
-      height: 100%;
-      padding: 2px;
-      white-space: pre-wrap;
-    }
     .cell.invalid {
       background-color: #fbb;
     }
+
     #number-pad button {
       width: 30px;
       height: 30px;
@@ -76,6 +62,16 @@
       margin-top: 10px;
       font-weight: bold;
     }
+    #note-values {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    #note-indicator {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #007bff;
+    }
   </style>
 </head>
 <body>
@@ -84,7 +80,7 @@
   <div id="menu">
     <label for="difficulty">選擇難度：</label>
     <select id="difficulty">
-      <option value="easy">入門（36~40）</option>
+      <option value="easy">入門（35~40）</option>
       <option value="normal">初級（31~35）</option>
       <option value="medium">中級（26~30）</option>
       <option value="hard">高級（21~25）</option>
@@ -96,7 +92,9 @@
   <div id="game-container" style="display:none;">
     <div id="timer">時間：00:00</div>
     <button onclick="toggleNote()">切換筆記模式</button>
+    <div id="note-indicator">筆記模式：關閉</div>
     <div id="sudoku-board"></div>
+    <div id="note-values">此格可能數值：</div>
     <div id="number-pad"></div>
     <button onclick="submitGame()">提交答案</button>
     <button onclick="location.reload()">回首頁</button>
@@ -105,7 +103,7 @@
 
   <script>
     const difficultyMap = {
-      easy: [36, 40],
+      easy: [35, 40],
       normal: [31, 35],
       medium: [26, 30],
       hard: [21, 25],
@@ -192,6 +190,10 @@
           cell.className = "cell";
           cell.dataset.row = r;
           cell.dataset.col = c;
+          if (r % 3 === 0) cell.classList.add("border-top");
+          if (r === 8) cell.classList.add("border-bottom");
+          if (c % 3 === 0) cell.classList.add("border-left");
+          if (c === 8) cell.classList.add("border-right");
           if (board[r][c] !== 0) {
             cell.textContent = board[r][c];
             cell.classList.add("fixed");
@@ -230,70 +232,72 @@
           cel.classList.add("same-number");
         }
       });
+      updateNoteHint(cell);
     }
 
     function enterNumber(num) {
       if (!selectedCell) return;
       let r = parseInt(selectedCell.dataset.row);
       let c = parseInt(selectedCell.dataset.col);
-      document.querySelectorAll('.cell').forEach(cell => cell.classList.remove("invalid"));
+
       if (notesMode) {
-        if (!selectedCell.querySelector('.notes')) {
-          let div = document.createElement('div');
-          div.className = 'notes';
-          selectedCell.innerHTML = '';
-          selectedCell.appendChild(div);
-        }
-        let note = selectedCell.querySelector('.notes');
-        let nums = note.textContent.split('').filter(n => n !== ' ' && n !== '\n');
-        if (nums.includes(num.toString())) {
-          nums = nums.filter(n => n !== num.toString());
+        let note = selectedCell.getAttribute("data-note") || "";
+        let notes = note.split("").map(n => parseInt(n)).filter(n => n >= 1 && n <= 9);
+        if (notes.includes(num)) {
+          notes = notes.filter(n => n !== num);
         } else {
-          nums.push(num.toString());
-          nums.sort();
+          notes.push(num);
+          notes.sort((a,b) => a - b);
         }
-        note.textContent = nums.join(' ');
+        selectedCell.setAttribute("data-note", notes.join(""));
+        selectedCell.textContent = notes.join("");
+        board[r][c] = 0;
+        document.getElementById("note-values").textContent = `此格可能數值：${notes.join(", ")}`;
       } else {
-        board[r][c] = num;
         selectedCell.textContent = num;
-        selectedCell.innerHTML = num;
-        let hasConflict = false;
-        document.querySelectorAll('.cell').forEach(cell => {
-          let row = parseInt(cell.dataset.row);
-          let col = parseInt(cell.dataset.col);
-          if (cell !== selectedCell && cell.textContent == num) {
-            if (row === r || col === c || (Math.floor(row/3) === Math.floor(r/3) && Math.floor(col/3) === Math.floor(c/3))) {
-              cell.classList.add("invalid");
-              hasConflict = true;
-            }
-          }
-        });
-        if (hasConflict) selectedCell.classList.add("invalid");
+        selectedCell.removeAttribute("data-note");
+        board[r][c] = num;
+        checkConflicts(r, c, num);
       }
+    }
+
+    function checkConflicts(row, col, num) {
+      document.querySelectorAll('.cell').forEach(cell => cell.classList.remove("invalid"));
+      let conflict = false;
+      document.querySelectorAll('.cell').forEach(cell => {
+        let r = parseInt(cell.dataset.row);
+        let c = parseInt(cell.dataset.col);
+        if (cell.textContent == num && !(r === row && c === col)) {
+          if (r === row || c === col || (Math.floor(r/3) === Math.floor(row/3) && Math.floor(c/3) === Math.floor(col/3))) {
+            cell.classList.add("invalid");
+            conflict = true;
+          }
+        }
+      });
+      if (conflict) selectedCell.classList.add("invalid");
     }
 
     function toggleNote() {
       notesMode = !notesMode;
-      alert("筆記模式：" + (notesMode ? "開啟" : "關閉"));
+      document.getElementById("note-indicator").textContent = "筆記模式：" + (notesMode ? "開啟" : "關閉");
+    }
+
+    function updateNoteHint(cell) {
+      let note = cell.getAttribute("data-note") || "";
+      document.getElementById("note-values").textContent = `此格可能數值：${note.split('').join(', ')}`;
     }
 
     function submitGame() {
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
-          if (board[r][c] !== solution[r][c]) {
+          if (board[r][c] != solution[r][c]) {
             document.getElementById('result-message').textContent = "❌ 答錯囉！請檢查紅色格子";
-            document.querySelectorAll('.cell').forEach(cell => {
-              if (parseInt(cell.dataset.row) === r && parseInt(cell.dataset.col) === c) {
-                cell.style.background = "#ffcccc";
-              }
-            });
             return;
           }
         }
       }
       stopTimer();
-      document.getElementById('result-message').textContent =
-        `🎉 恭喜完成！難度：${document.getElementById("difficulty").selectedOptions[0].text}，耗時：${formatTime(seconds)}`;
+      document.getElementById('result-message').textContent = `🎉 恭喜完成！耗時：${formatTime(seconds)}`;
     }
 
     function shuffle(arr) {
