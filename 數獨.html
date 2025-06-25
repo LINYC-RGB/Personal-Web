@@ -108,7 +108,7 @@
     <div id="note-values">此格可能數值：</div>
     <div id="number-pad"></div>
     <button onclick="submitGame()">提交答案</button>
-    <button onclick="location.reload()">回難度選擇頁</button>
+    <button onclick="location.reload()">回難度選擇</button>
     <div id="result-message"></div>
   </div>
 
@@ -215,50 +215,36 @@
       }
     }
 
-    function renderNumberPad() {
-      const pad = document.getElementById("number-pad");
-      pad.innerHTML = '';
-      for (let i = 1; i <= 9; i++) {
-        const btn = document.createElement("button");
-        btn.textContent = i;
-        btn.onclick = () => enterNumber(i);
-        pad.appendChild(btn);
-      }
-    }
-
     function selectCell(cell) {
       if (!timerStarted) startTimer();
       document.querySelectorAll('.cell').forEach(c => {
         c.classList.remove("highlight", "same-number", "invalid");
       });
+
       let r = parseInt(cell.dataset.row);
       let c = parseInt(cell.dataset.col);
       selectedCell = cell;
 
-      // 高亮同行同列
       document.querySelectorAll('.cell').forEach(cel => {
         let row = parseInt(cel.dataset.row);
         let col = parseInt(cel.dataset.col);
         if (row === r || col === c) cel.classList.add("highlight");
+        if (cel.textContent === cell.textContent && cell.textContent) {
+          cel.classList.add("same-number");
+        }
       });
 
-      // 高亮相同數字
-      let val = cell.textContent;
-      if (val) {
-        document.querySelectorAll('.cell').forEach(cel => {
-          if (cel.textContent === val) {
-            cel.classList.add("same-number");
-          }
-        });
-      }
-
       updateNoteHint(cell);
+      updateNumberPad();
     }
 
     function enterNumber(num) {
       if (!selectedCell || selectedCell.classList.contains("fixed")) return;
       let r = parseInt(selectedCell.dataset.row);
       let c = parseInt(selectedCell.dataset.col);
+      const used = getUsedNumbers(r, c);
+
+      if (used.has(num)) return;
 
       if (notesMode) {
         let note = selectedCell.getAttribute("data-note") || "";
@@ -270,7 +256,6 @@
           notes.sort((a,b) => a - b);
         }
         selectedCell.setAttribute("data-note", notes.join(""));
-        // 不顯示在格子內
         selectedCell.textContent = "";
         board[r][c] = 0;
         document.getElementById("note-values").textContent = `此格可能數值：${notes.join(", ")}`;
@@ -280,6 +265,59 @@
         board[r][c] = num;
         checkConflicts(r, c, num);
       }
+    }
+
+    function getUsedNumbers(row, col) {
+      const used = new Set();
+      for (let i = 0; i < 9; i++) {
+        if (board[row][i] !== 0) used.add(board[row][i]);
+        if (board[i][col] !== 0) used.add(board[i][col]);
+      }
+      let br = Math.floor(row / 3) * 3;
+      let bc = Math.floor(col / 3) * 3;
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          let val = board[br + i][bc + j];
+          if (val !== 0) used.add(val);
+        }
+      }
+      return used;
+    }
+
+    function renderNumberPad() {
+      const pad = document.getElementById("number-pad");
+      pad.innerHTML = '';
+      const row = selectedCell ? parseInt(selectedCell.dataset.row) : null;
+      const col = selectedCell ? parseInt(selectedCell.dataset.col) : null;
+      const used = (selectedCell && row !== null && col !== null)
+        ? getUsedNumbers(row, col)
+        : new Set();
+      for (let i = 1; i <= 9; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.disabled = used.has(i);
+        if (btn.disabled) {
+          btn.style.opacity = 0.4;
+          btn.style.cursor = "not-allowed";
+        }
+        btn.onclick = () => enterNumber(i);
+        pad.appendChild(btn);
+      }
+    }
+
+    function updateNumberPad() {
+      renderNumberPad();
+    }
+
+    function toggleNote() {
+      notesMode = !notesMode;
+      document.getElementById("note-indicator").textContent = "筆記模式：" + (notesMode ? "開啟" : "關閉");
+      updateNumberPad();
+    }
+
+    function updateNoteHint(cell) {
+      let note = cell.getAttribute("data-note") || "";
+      document.getElementById("note-values").textContent = `此格可能數值：${note.split('').join(', ')}`;
     }
 
     function checkConflicts(row, col, num) {
@@ -296,16 +334,6 @@
         }
       });
       if (conflict) selectedCell.classList.add("invalid");
-    }
-
-    function toggleNote() {
-      notesMode = !notesMode;
-      document.getElementById("note-indicator").textContent = "筆記模式：" + (notesMode ? "開啟" : "關閉");
-    }
-
-    function updateNoteHint(cell) {
-      let note = cell.getAttribute("data-note") || "";
-      document.getElementById("note-values").textContent = `此格可能數值：${note.split('').join(', ')}`;
     }
 
     function submitGame() {
