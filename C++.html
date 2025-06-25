@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>基礎 C++ 觀念</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      line-height: 1.6;
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    code {
+      background-color: #eef;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+    }
+    pre {
+      background: #eee;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #ddd;
+    }
+    .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back-button:hover {
+            background-color: #388E3C;
+        }
+  </style>
+</head>
+<body>
+  <h1>🔰 基礎 C++ 觀念整理</h1>
+
+  <h2>1️⃣ 程式基本結構</h2>
+  <pre><code>#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    cout &lt;&lt; "Hello, world!" &lt;&lt; endl;
+    return 0;
+}</code></pre>
+
+  <h2>2️⃣ 變數與資料型別</h2>
+  <table>
+    <tr><th>型別</th><th>意義</th><th>範例</th></tr>
+    <tr><td>int</td><td>整數</td><td><code>int age = 20;</code></td></tr>
+    <tr><td>float</td><td>浮點數</td><td><code>float pi = 3.14;</code></td></tr>
+    <tr><td>double</td><td>雙精度浮點</td><td><code>double d = 3.1415;</code></td></tr>
+    <tr><td>char</td><td>字元</td><td><code>char c = 'A';</code></td></tr>
+    <tr><td>bool</td><td>布林值</td><td><code>bool isOpen = true;</code></td></tr>
+    <tr><td>string</td><td>字串（需引入）</td><td><code>string name = "Tom";</code></td></tr>
+  </table>
+
+  <pre><code>#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    int age = 18;
+    string name = "Alice";
+    cout &lt;&lt; name &lt;&lt; " is " &lt;&lt; age &lt;&lt; " years old." &lt;&lt; endl;
+    return 0;
+}</code></pre>
+
+  <h2>3️⃣ 條件判斷</h2>
+  <pre><code>int score = 85;
+if (score &gt;= 60) {
+    cout &lt;&lt; "及格" &lt;&lt; endl;
+} else {
+    cout &lt;&lt; "不及格" &lt;&lt; endl;
+}</code></pre>
+
+  <h2>4️⃣ 迴圈</h2>
+  <strong>while 迴圈：</strong>
+  <pre><code>int i = 0;
+while (i &lt; 5) {
+    cout &lt;&lt; i &lt;&lt; " ";
+    i++;
+}</code></pre>
+
+  <strong>for 迴圈：</strong>
+  <pre><code>for (int i = 0; i &lt; 5; i++) {
+    cout &lt;&lt; i &lt;&lt; " ";
+}</code></pre>
+
+  <h2>5️⃣ 陣列（Array）</h2>
+  <pre><code>int nums[3] = {10, 20, 30};
+cout &lt;&lt; nums[1]; // 輸出 20</code></pre>
+
+  <h2>6️⃣ 函式（Function）</h2>
+  <pre><code>int add(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    cout &lt;&lt; add(3, 4); // 輸出 7
+    return 0;
+}</code></pre>
+
+  <h2>7️⃣ 類別（Class）與物件（Object）</h2>
+  <pre><code>class Student {
+public:
+    string name;
+    int age;
+
+    void sayHello() {
+        cout &lt;&lt; "Hi, I'm " &lt;&lt; name &lt;&lt; endl;
+    }
+};
+
+int main() {
+    Student s;
+    s.name = "Amy";
+    s.age = 19;
+    s.sayHello();
+    return 0;
+}</code></pre>
+
+<a href="index.html" class="back-button">回首頁</a>
+</body>
+</html>
