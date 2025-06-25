@@ -35,7 +35,7 @@
                 <a class="link-button" href="key.html"> 【密碼強度檢查器】 </a>
                 <a class="link-button" href="break-key.html"> 【密碼暴力破解模擬器】 </a>
                 <a class="link-button" href="AES.html"> 【簡易AES加密/解密工具】 </a>
-                
+                <a class="link-button" href="踩地雷.html"> 【踩地雷】 </a>
             </div>
         </section>
 
