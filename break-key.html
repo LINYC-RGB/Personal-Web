@@ -13,13 +13,13 @@
         input {
             padding: 10px;
             font-size: 18px;
-            width: 120px;
+            width: 100px;
             text-align: center;
         }
         button {
             padding: 10px 20px;
             font-size: 18px;
-            margin-top: 10px;
+            margin: 10px;
             cursor: pointer;
         }
         .output {
@@ -50,18 +50,21 @@
 </head>
 <body>
     <h1>🔐 密碼暴力破解模擬器</h1>
-    <p>請輸入 6 位數字密碼：</p>
-    <input type="text" id="password" maxlength="6" pattern="\d{6}" placeholder="例如：123456">
+    <p>請輸入 4 位數字密碼：</p>
+    <input type="text" id="password" maxlength="4" pattern="\d{4}" placeholder="例如：1234">
     <br>
     <button onclick="startBruteForce()">開始破解</button>
+    <button onclick="stopBruteForce()">🛑 停止破解</button>
 
     <div class="output" id="output"></div>
     <div class="crack-box" id="currentTry"></div>
 
     <!-- 🔙 回首頁 -->
-    <a href="index.html" class="home-btn">🔙 回首頁</a>
+    <a href="index.html" class="home-btn">回首頁</a>
 
     <script>
+        let interval = null;
+
         function startBruteForce() {
             const target = document.getElementById('password').value;
             const output = document.getElementById('output');
@@ -69,16 +72,16 @@
             output.innerHTML = "";
             currentTry.innerHTML = "";
 
-            if (!/^\d{6}$/.test(target)) {
-                alert("請輸入有效的6位數字密碼！");
+            if (!/^\d{4}$/.test(target)) {
+                alert("請輸入有效的4位數字密碼！");
                 return;
             }
 
             let guess = 0;
             const startTime = performance.now();
 
-            const interval = setInterval(() => {
-                let attempt = guess.toString().padStart(6, '0');
+            interval = setInterval(() => {
+                let attempt = guess.toString().padStart(4, '0');
                 currentTry.textContent = `嘗試中：${attempt}`;
                 
                 if (attempt === target) {
@@ -93,8 +96,17 @@
                 }
 
                 guess++;
-                if (guess > 999999) clearInterval(interval);
-            }, 1); // 可依硬體條件調整速度
+                if (guess > 9999) clearInterval(interval);
+            }, 1);
+        }
+
+        function stopBruteForce() {
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+                document.getElementById('currentTry').textContent = "🛑 破解已手動停止";
+                document.getElementById('output').innerHTML = "⏹️ 破解過程中止。";
+            }
         }
     </script>
 </body>
