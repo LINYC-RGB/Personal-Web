@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>數獨遊戲</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+    }
+    #menu, #game-container {
+      margin-top: 20px;
+    }
+    #sudoku-board {
+      display: grid;
+      grid-template-columns: repeat(9, 40px);
+      grid-template-rows: repeat(9, 40px);
+      gap: 2px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      border: 1px solid #ccc;
+      text-align: center;
+      line-height: 40px;
+      background: white;
+      position: relative;
+      cursor: pointer;
+    }
+    .cell.fixed {
+      background: #e0e0e0;
+      font-weight: bold;
+    }
+    .cell.highlight {
+      background: #cfe8fc;
+    }
+    .cell.same-number {
+      background: #ffe4b2;
+    }
+    .notes {
+      font-size: 10px;
+      line-height: 13px;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      text-align: left;
+      width: 100%;
+      height: 100%;
+      padding: 2px;
+      white-space: pre-wrap;
+    }
+    #number-pad button {
+      width: 30px;
+      height: 30px;
+      margin: 3px;
+    }
+    #result-message {
+      font-size: 18px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>數獨遊戲</h1>
+
+  <div id="menu">
+    <label for="difficulty">選擇難度：</label>
+    <select id="difficulty">
+      <option value="easy">入門（30~35）</option>
+      <option value="normal">初級（26~29）</option>
+      <option value="medium">中級（23~25）</option>
+      <option value="hard">高級（20~22）</option>
+      <option value="expert">超級（17~19）</option>
+    </select>
+    <button onclick="startGame()">開始遊戲</button>
+  </div>
+
+  <div id="game-container" style="display:none;">
+    <div id="timer">時間：00:00</div>
+    <button onclick="toggleNote()">切換筆記模式</button>
+    <div id="sudoku-board"></div>
+    <div id="number-pad"></div>
+    <button onclick="submitGame()">提交答案</button>
+    <button onclick="location.reload()">回選擇難度</button>
+    <div id="result-message"></div>
+  </div>
+
+  <script>
+    const difficultyMap = {
+      easy: [30, 35],
+      normal: [26, 29],
+      medium: [23, 25],
+      hard: [20, 22],
+      expert: [17, 19]
+    };
+
+    let board = [];
+    let solution = [];
+    let selectedCell = null;
+    let notesMode = false;
+    let timerStarted = false;
+    let timerInterval;
+    let seconds = 0;
+
+    function startGame() {
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('game-container').style.display = 'block';
+
+      let difficulty = document.getElementById("difficulty").value;
+      let [min, max] = difficultyMap[difficulty];
+      let clues = Math.floor(Math.random() * (max - min + 1)) + min;
+
+      solution = generateFullBoard();
+      board = maskBoard(solution, clues);
+
+      renderBoard();
+      renderNumberPad();
+      resetTimer();
+    }
+
+    function generateFullBoard() {
+      let board = Array(9).fill().map(() => Array(9).fill(0));
+
+      function isValid(board, row, col, num) {
+        for (let i = 0; i < 9; i++) {
+          if (board[row][i] === num || board[i][col] === num ||
+              board[Math.floor(row/3)*3 + Math.floor(i/3)][Math.floor(col/3)*3 + i%3] === num) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function solve(board) {
+        for (let row = 0; row < 9; row++) {
+          for (let col = 0; col < 9; col++) {
+            if (board[row][col] === 0) {
+              let nums = shuffle([1,2,3,4,5,6,7,8,9]);
+              for (let num of nums) {
+                if (isValid(board, row, col, num)) {
+                  board[row][col] = num;
+                  if (solve(board)) return true;
+                  board[row][col] = 0;
+                }
+              }
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+
+      solve(board);
+      return board.map(row => row.slice());
+    }
+
+    function maskBoard(full, clues) {
+      let board = full.map(row => row.slice());
+      let cells = [...Array(81).keys()];
+      shuffle(cells);
+      let removed = 81 - clues;
+
+      while (removed > 0 && cells.length) {
+        let idx = cells.pop();
+        let r = Math.floor(idx / 9), c = idx % 9;
+        let backup = board[r][c];
+        board[r][c] = 0;
+
+        // skip uniqueness check for simplicity (fast demo)
+        removed--;
+      }
+      return board;
+    }
+
+    function renderBoard() {
+      const container = document.getElementById("sudoku-board");
+      container.innerHTML = '';
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+
+          if (board[r][c] !== 0) {
+            cell.textContent = board[r][c];
+            cell.classList.add("fixed");
+          }
+
+          cell.onclick = () => selectCell(cell);
+          container.appendChild(cell);
+        }
+      }
+    }
+
+    function renderNumberPad() {
+      const pad = document.getElementById("number-pad");
+      pad.innerHTML = '';
+      for (let i = 1; i <= 9; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.onclick = () => enterNumber(i);
+        pad.appendChild(btn);
+      }
+    }
+
+    function selectCell(cell) {
+      if (cell.classList.contains("fixed")) return;
+
+      if (!timerStarted) startTimer();
+
+      document.querySelectorAll('.cell').forEach(c => {
+        c.classList.remove("highlight", "same-number");
+      });
+
+      let r = parseInt(cell.dataset.row);
+      let c = parseInt(cell.dataset.col);
+      selectedCell = cell;
+
+      document.querySelectorAll('.cell').forEach(cel => {
+        let row = parseInt(cel.dataset.row);
+        let col = parseInt(cel.dataset.col);
+        if (row === r || col === c) cel.classList.add("highlight");
+        if (cel.textContent === cell.textContent && cell.textContent) {
+          cel.classList.add("same-number");
+        }
+      });
+    }
+
+    function enterNumber(num) {
+      if (!selectedCell) return;
+      let r = parseInt(selectedCell.dataset.row);
+      let c = parseInt(selectedCell.dataset.col);
+
+      if (notesMode) {
+        if (!selectedCell.querySelector('.notes')) {
+          let div = document.createElement('div');
+          div.className = 'notes';
+          selectedCell.innerHTML = '';
+          selectedCell.appendChild(div);
+        }
+        let note = selectedCell.querySelector('.notes');
+        let nums = note.textContent.split('').filter(n => n !== ' ' && n !== '\n');
+        if (nums.includes(num.toString())) {
+          nums = nums.filter(n => n !== num.toString());
+        } else {
+          nums.push(num.toString());
+          nums.sort();
+        }
+        note.textContent = nums.join(' ');
+      } else {
+        board[r][c] = num;
+        selectedCell.textContent = num;
+        selectedCell.classList.remove("notes");
+        selectedCell.innerHTML = num;
+      }
+    }
+
+    function toggleNote() {
+      notesMode = !notesMode;
+      alert("筆記模式：" + (notesMode ? "開啟" : "關閉"));
+    }
+
+    function submitGame() {
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          if (board[r][c] !== solution[r][c]) {
+            document.getElementById('result-message').textContent = "❌ 答錯囉！請檢查紅色格子";
+            document.querySelectorAll('.cell').forEach(cell => {
+              if (parseInt(cell.dataset.row) === r && parseInt(cell.dataset.col) === c) {
+                cell.style.background = "#ffcccc";
+              }
+            });
+            return;
+          }
+        }
+      }
+      stopTimer();
+      document.getElementById('result-message').textContent =
+        `🎉 恭喜完成！難度：${document.getElementById("difficulty").selectedOptions[0].text}，耗時：${formatTime(seconds)}`;
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function resetTimer() {
+      seconds = 0;
+      clearInterval(timerInterval);
+      document.getElementById('timer').textContent = "時間：00:00";
+      timerStarted = false;
+    }
+
+    function startTimer() {
+      timerStarted = true;
+      timerInterval = setInterval(() => {
+        seconds++;
+        document.getElementById("timer").textContent = "時間：" + formatTime(seconds);
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function formatTime(secs) {
+      let m = Math.floor(secs / 60).toString().padStart(2, '0');
+      let s = (secs % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    document.addEventListener('keydown', e => {
+      if (!selectedCell || isNaN(e.key) || e.key < '1' || e.key > '9') return;
+      enterNumber(parseInt(e.key));
+    });
+  </script>
+</body>
+</html>
