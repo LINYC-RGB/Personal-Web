@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>簡易AES加密/解密工具</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 2em;
+    }
+    h1 { text-align: center; }
+    input, button {
+      margin: 0.5em 0;
+      padding: 0.5em;
+      width: 100%;
+    }
+    .section {
+      margin-top: 2em;
+      border-top: 1px solid #ccc;
+      padding-top: 1em;
+    }
+    .home-button {
+      margin-top: 3em;
+      text-align: center;
+    }
+    .home-button a {
+      text-decoration: none;
+      padding: 0.5em 1em;
+      background: #007BFF;
+      color: white;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>AES 加密/解密工具</h1>
+
+  <div>
+    <label>選擇檔案：</label>
+    <input type="file" id="fileInput">
+    
+    <label>輸入密碼（加/解密使用）：</label>
+    <input type="password" id="passwordInput">
+    
+    <button onclick="encryptFile()">🔒 加密檔案</button>
+    <button onclick="decryptFile()">🔓 解密檔案</button>
+  </div>
+
+  <div class="section" id="message"></div>
+
+  <div class="home-button">
+    <a href="/">🏠 回首頁</a>
+  </div>
+
+  <script>
+    async function getKey(password) {
+      const encoder = new TextEncoder();
+      const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        encoder.encode(password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+      );
+      return window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: encoder.encode("some-static-salt"),
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    async function encryptFile() {
+      const file = document.getElementById("fileInput").files[0];
+      const password = document.getElementById("passwordInput").value;
+      if (!file || !password) return showMessage("請選擇檔案並輸入密碼");
+
+      const arrayBuffer = await file.arrayBuffer();
+      const key = await getKey(password);
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const encrypted = await window.crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        key,
+        arrayBuffer
+      );
+
+      const result = new Uint8Array(iv.length + encrypted.byteLength);
+      result.set(iv, 0);
+      result.set(new Uint8Array(encrypted), iv.length);
+
+      downloadBlob(result, file.name + ".enc");
+      showMessage("✅ 檔案已加密並下載");
+    }
+
+    async function decryptFile() {
+      const file = document.getElementById("fileInput").files[0];
+      const password = document.getElementById("passwordInput").value;
+      if (!file || !password) return showMessage("請選擇加密檔案並輸入密碼");
+
+      const encrypted = new Uint8Array(await file.arrayBuffer());
+      const iv = encrypted.slice(0, 12);
+      const data = encrypted.slice(12);
+
+      const key = await getKey(password);
+
+      try {
+        const decrypted = await window.crypto.subtle.decrypt(
+          { name: "AES-GCM", iv },
+          key,
+          data
+        );
+        downloadBlob(new Uint8Array(decrypted), file.name.replace(/\.enc$/, ''));
+        showMessage("✅ 解密成功，檔案已下載");
+      } catch (err) {
+        showMessage("❌ 解密失敗，可能是密碼錯誤或檔案損壞");
+      }
+    }
+
+    function downloadBlob(data, filename) {
+      const blob = new Blob([data]);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
+    function showMessage(msg) {
+      document.getElementById("message").textContent = msg;
+    }
+  </script>
+</body>
+</html>
