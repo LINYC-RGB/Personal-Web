@@ -18,7 +18,6 @@
       grid-template-rows: repeat(9, 40px);
       justify-content: center;
       margin: 20px auto;
-      border-collapse: collapse;
     }
     .cell {
       width: 40px;
@@ -72,18 +71,18 @@
       font-weight: bold;
       color: #007bff;
     }
-        .back-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-        .back-button:hover {
-            background-color: #388E3C;
-        }
+    .back-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    .back-button:hover {
+      background-color: #388E3C;
+    }
   </style>
 </head>
 <body>
@@ -109,7 +108,7 @@
     <div id="note-values">此格可能數值：</div>
     <div id="number-pad"></div>
     <button onclick="submitGame()">提交答案</button>
-    <button onclick="location.reload()">回首頁</button>
+    <button onclick="location.reload()">回難度選擇頁</button>
     <div id="result-message"></div>
   </div>
 
@@ -228,7 +227,6 @@
     }
 
     function selectCell(cell) {
-      if (cell.classList.contains("fixed")) return;
       if (!timerStarted) startTimer();
       document.querySelectorAll('.cell').forEach(c => {
         c.classList.remove("highlight", "same-number", "invalid");
@@ -236,19 +234,29 @@
       let r = parseInt(cell.dataset.row);
       let c = parseInt(cell.dataset.col);
       selectedCell = cell;
+
+      // 高亮同行同列
       document.querySelectorAll('.cell').forEach(cel => {
         let row = parseInt(cel.dataset.row);
         let col = parseInt(cel.dataset.col);
         if (row === r || col === c) cel.classList.add("highlight");
-        if (cel.textContent === cell.textContent && cell.textContent) {
-          cel.classList.add("same-number");
-        }
       });
+
+      // 高亮相同數字
+      let val = cell.textContent;
+      if (val) {
+        document.querySelectorAll('.cell').forEach(cel => {
+          if (cel.textContent === val) {
+            cel.classList.add("same-number");
+          }
+        });
+      }
+
       updateNoteHint(cell);
     }
 
     function enterNumber(num) {
-      if (!selectedCell) return;
+      if (!selectedCell || selectedCell.classList.contains("fixed")) return;
       let r = parseInt(selectedCell.dataset.row);
       let c = parseInt(selectedCell.dataset.col);
 
@@ -262,7 +270,8 @@
           notes.sort((a,b) => a - b);
         }
         selectedCell.setAttribute("data-note", notes.join(""));
-        selectedCell.textContent = notes.join("");
+        // 不顯示在格子內
+        selectedCell.textContent = "";
         board[r][c] = 0;
         document.getElementById("note-values").textContent = `此格可能數值：${notes.join(", ")}`;
       } else {
@@ -350,6 +359,6 @@
       enterNumber(parseInt(e.key));
     });
   </script>
-      <a href="index.html" class="back-button">回首頁</a>
+  <a href="index.html" class="back-button">回首頁</a>
 </body>
 </html>
