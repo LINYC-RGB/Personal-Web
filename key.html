@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>密碼強度分析工具</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f8f9fa;
+      padding: 40px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 10px;
+      box-sizing: border-box;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .strength-bar {
+      height: 10px;
+      margin-top: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .strength-bar-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .strength-weak { background-color: #e74c3c; }
+    .strength-medium { background-color: #f39c12; }
+    .strength-strong { background-color: #2ecc71; }
+
+    #strengthText {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    ul {
+      margin-top: 15px;
+      padding-left: 20px;
+    }
+
+    li.ok::before {
+      content: "✅ ";
+      color: green;
+    }
+
+    li.warn::before {
+      content: "⚠️ ";
+      color: orange;
+    }
+
+    #suggestion {
+      margin-top: 10px;
+      color: #c0392b;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .home-button {
+            display: block;
+            width: fit-content;
+            margin: 40px auto;
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .home-button:hover {
+            background-color: #004c99;
+        }
+  </style>
+</head>
+<body>
+
+  <h2>🔐 密碼強度分析工具</h2>
+  <input type="password" id="passwordInput" placeholder="請輸入密碼...">
+
+  <div class="strength-bar">
+    <div id="barFill" class="strength-bar-fill"></div>
+  </div>
+
+  <p id="strengthText">請輸入密碼以分析強度</p>
+
+  <ul id="analysisList"></ul>
+  <p id="suggestion"></p>
+
+  <footer>
+    © 2025 密碼強度分析工具
+  </footer>
+
+  <script>
+    const input = document.getElementById("passwordInput");
+    const bar = document.getElementById("barFill");
+    const text = document.getElementById("strengthText");
+    const list = document.getElementById("analysisList");
+    const suggestion = document.getElementById("suggestion");
+
+    input.addEventListener("input", () => {
+      const pwd = input.value;
+      let score = 0;
+      list.innerHTML = "";
+      suggestion.innerText = "";
+
+      const checks = [
+        { test: pwd.length >= 8, label: "密碼長度 ≥ 8" },
+        { test: /[A-Z]/.test(pwd), label: "包含大寫字母" },
+        { test: /[a-z]/.test(pwd), label: "包含小寫字母" },
+        { test: /[0-9]/.test(pwd), label: "包含數字" },
+        { test: /[^A-Za-z0-9]/.test(pwd), label: "包含特殊符號" }
+      ];
+
+      checks.forEach(c => {
+        const li = document.createElement("li");
+        li.textContent = c.label;
+        li.className = c.test ? "ok" : "warn";
+        if (c.test) score++;
+        list.appendChild(li);
+      });
+
+      let percent = (score / checks.length) * 100;
+      bar.style.width = percent + "%";
+      bar.className = "strength-bar-fill";
+
+      if (score <= 2) {
+        bar.classList.add("strength-weak");
+        text.innerText = "強度：弱 🔴";
+        suggestion.innerText = "建議：請增加長度，加入大小寫字母、數字與特殊符號。";
+      } else if (score === 3 || score === 4) {
+        bar.classList.add("strength-medium");
+        text.innerText = "強度：中等 🟠";
+      } else {
+        bar.classList.add("strength-strong");
+        text.innerText = "強度：強 🟢💪";
+      }
+    });
+  </script>
+
+<a href="index.html" class="back-button">回首頁</a>
+
+</body>
+</html>
