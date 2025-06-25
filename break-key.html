@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>密碼暴力破解模擬</title>
+    <style>
+        body {
+            font-family: "Courier New", monospace;
+            text-align: center;
+            padding: 40px;
+            background-color: #f9f9f9;
+        }
+        input {
+            padding: 10px;
+            font-size: 18px;
+            width: 120px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .output {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #333;
+        }
+        .crack-box {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #d9534f;
+        }
+        .home-btn {
+            margin-top: 50px;
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #5bc0de;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .home-btn:hover {
+            background-color: #31b0d5;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 密碼暴力破解模擬器</h1>
+    <p>請輸入 6 位數字密碼：</p>
+    <input type="text" id="password" maxlength="6" pattern="\d{6}" placeholder="例如：123456">
+    <br>
+    <button onclick="startBruteForce()">開始破解</button>
+
+    <div class="output" id="output"></div>
+    <div class="crack-box" id="currentTry"></div>
+
+    <!-- 🔙 回首頁 -->
+    <a href="index.html" class="home-btn">🔙 回首頁</a>
+
+    <script>
+        function startBruteForce() {
+            const target = document.getElementById('password').value;
+            const output = document.getElementById('output');
+            const currentTry = document.getElementById('currentTry');
+            output.innerHTML = "";
+            currentTry.innerHTML = "";
+
+            if (!/^\d{6}$/.test(target)) {
+                alert("請輸入有效的6位數字密碼！");
+                return;
+            }
+
+            let guess = 0;
+            const startTime = performance.now();
+
+            const interval = setInterval(() => {
+                let attempt = guess.toString().padStart(6, '0');
+                currentTry.textContent = `嘗試中：${attempt}`;
+                
+                if (attempt === target) {
+                    clearInterval(interval);
+                    const endTime = performance.now();
+                    const duration = ((endTime - startTime) / 1000).toFixed(3);
+                    output.innerHTML = `
+                        ✅ 破解成功！<br>
+                        您的密碼是：<strong>${attempt}</strong><br>
+                        暴力破解共花費：<strong>${duration}</strong> 秒
+                    `;
+                }
+
+                guess++;
+                if (guess > 999999) clearInterval(interval);
+            }, 1); // 可依硬體條件調整速度
+        }
+    </script>
+</body>
+</html>
