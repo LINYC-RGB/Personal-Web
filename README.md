@@ -33,6 +33,7 @@
             <h2>My Side Project</h2>
             <div class="button-container">
                 <a class="link-button" href="key.html"> 【密碼強度檢查器】 </a>
+                <a class="link-button" href="break-key.html"> 【密碼暴力破解模擬器】 </a>
                 <a class="link-button" href="AES.html"> 【簡易AES加密/解密工具】 </a>
                 
             </div>
