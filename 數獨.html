@@ -16,7 +16,6 @@
       display: grid;
       grid-template-columns: repeat(9, 40px);
       grid-template-rows: repeat(9, 40px);
-      gap: 0;
       justify-content: center;
       margin: 20px auto;
       border: 3px solid #000;
@@ -32,6 +31,14 @@
       cursor: pointer;
       box-sizing: border-box;
       border: 1px solid #ccc;
+    }
+    .cell:nth-child(9n+1) { border-left: 3px solid #000; }
+    .cell:nth-child(9n)   { border-right: 3px solid #000; }
+    .cell:nth-child(-n+9) { border-top: 3px solid #000; }
+    .cell:nth-child(n+19):nth-child(-n+27),
+    .cell:nth-child(n+46):nth-child(-n+54),
+    .cell:nth-child(n+73):nth-child(-n+81) {
+      border-bottom: 3px solid #000;
     }
     .cell.fixed {
       background: #e0e0e0;
@@ -59,19 +66,6 @@
     .cell.invalid {
       background-color: #fbb;
     }
-
-    /* 粗邊界 */
-    .cell:nth-child(9n+1) { border-left: 3px solid #000; }
-    .cell:nth-child(9n)   { border-right: 3px solid #000; }
-    .cell:nth-child(n+1):nth-child(-n+9),
-    .cell:nth-child(n+28):nth-child(-n+36),
-    .cell:nth-child(n+55):nth-child(-n+63) {
-      border-top: 3px solid #000;
-    }
-    .cell:nth-child(n+73):nth-child(-n+81) {
-      border-bottom: 3px solid #000;
-    }
-
     #number-pad button {
       width: 30px;
       height: 30px;
@@ -82,32 +76,19 @@
       margin-top: 10px;
       font-weight: bold;
     }
-    .back-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-        .back-button:hover {
-            background-color: #388E3C;
-        }
   </style>
 </head>
 <body>
-
   <h1>數獨遊戲</h1>
 
   <div id="menu">
     <label for="difficulty">選擇難度：</label>
     <select id="difficulty">
-      <option value="easy">入門（30~35）</option>
-      <option value="normal">初級（26~29）</option>
-      <option value="medium">中級（23~25）</option>
-      <option value="hard">高級（20~22）</option>
-      <option value="expert">超級（17~19）</option>
+      <option value="easy">入門（36~40）</option>
+      <option value="normal">初級（31~35）</option>
+      <option value="medium">中級（26~30）</option>
+      <option value="hard">高級（21~25）</option>
+      <option value="expert">超級（17~20）</option>
     </select>
     <button onclick="startGame()">開始遊戲</button>
   </div>
@@ -124,11 +105,11 @@
 
   <script>
     const difficultyMap = {
-      easy: [30, 35],
-      normal: [26, 29],
-      medium: [23, 25],
-      hard: [20, 22],
-      expert: [17, 19]
+      easy: [36, 40],
+      normal: [31, 35],
+      medium: [26, 30],
+      hard: [21, 25],
+      expert: [17, 20]
     };
 
     let board = [];
@@ -157,7 +138,6 @@
 
     function generateFullBoard() {
       let board = Array(9).fill().map(() => Array(9).fill(0));
-
       function isValid(board, row, col, num) {
         for (let i = 0; i < 9; i++) {
           if (board[row][i] === num || board[i][col] === num ||
@@ -167,7 +147,6 @@
         }
         return true;
       }
-
       function solve(board) {
         for (let row = 0; row < 9; row++) {
           for (let col = 0; col < 9; col++) {
@@ -186,7 +165,6 @@
         }
         return true;
       }
-
       solve(board);
       return board.map(row => row.slice());
     }
@@ -196,14 +174,10 @@
       let cells = [...Array(81).keys()];
       shuffle(cells);
       let removed = 81 - clues;
-
       while (removed > 0 && cells.length) {
         let idx = cells.pop();
         let r = Math.floor(idx / 9), c = idx % 9;
-        let backup = board[r][c];
         board[r][c] = 0;
-
-        // 跳過唯一解驗證（demo用途）
         removed--;
       }
       return board;
@@ -218,12 +192,10 @@
           cell.className = "cell";
           cell.dataset.row = r;
           cell.dataset.col = c;
-
           if (board[r][c] !== 0) {
             cell.textContent = board[r][c];
             cell.classList.add("fixed");
           }
-
           cell.onclick = () => selectCell(cell);
           container.appendChild(cell);
         }
@@ -243,17 +215,13 @@
 
     function selectCell(cell) {
       if (cell.classList.contains("fixed")) return;
-
       if (!timerStarted) startTimer();
-
       document.querySelectorAll('.cell').forEach(c => {
         c.classList.remove("highlight", "same-number", "invalid");
       });
-
       let r = parseInt(cell.dataset.row);
       let c = parseInt(cell.dataset.col);
       selectedCell = cell;
-
       document.querySelectorAll('.cell').forEach(cel => {
         let row = parseInt(cel.dataset.row);
         let col = parseInt(cel.dataset.col);
@@ -268,9 +236,7 @@
       if (!selectedCell) return;
       let r = parseInt(selectedCell.dataset.row);
       let c = parseInt(selectedCell.dataset.col);
-
       document.querySelectorAll('.cell').forEach(cell => cell.classList.remove("invalid"));
-
       if (notesMode) {
         if (!selectedCell.querySelector('.notes')) {
           let div = document.createElement('div');
@@ -291,8 +257,6 @@
         board[r][c] = num;
         selectedCell.textContent = num;
         selectedCell.innerHTML = num;
-
-        // 驗證是否有重複
         let hasConflict = false;
         document.querySelectorAll('.cell').forEach(cell => {
           let row = parseInt(cell.dataset.row);
@@ -304,7 +268,6 @@
             }
           }
         });
-
         if (hasConflict) selectedCell.classList.add("invalid");
       }
     }
@@ -318,7 +281,7 @@
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
           if (board[r][c] !== solution[r][c]) {
-            document.getElementById('result-message').textContent = "❌出現重複！請檢查紅色格子";
+            document.getElementById('result-message').textContent = "❌ 答錯囉！請檢查紅色格子";
             document.querySelectorAll('.cell').forEach(cell => {
               if (parseInt(cell.dataset.row) === r && parseInt(cell.dataset.col) === c) {
                 cell.style.background = "#ffcccc";
@@ -371,6 +334,5 @@
       enterNumber(parseInt(e.key));
     });
   </script>
-      <a href="index.html" class="back-button">回首頁</a>
 </body>
 </html>
