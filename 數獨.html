@@ -16,45 +16,35 @@
       display: grid;
       grid-template-columns: repeat(9, 40px);
       grid-template-rows: repeat(9, 40px);
-      gap: 2px;
+      gap: 0;
       justify-content: center;
       margin: 20px auto;
+      border: 3px solid #000;
     }
-   .cell {
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  border: 1px solid #ccc;
-  text-align: center;
-  line-height: 40px;
-  background: white;
-  position: relative;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-/* 加上粗邊界區分 3x3 宮 */
-.cell:nth-child(3n+1) {
-  border-left: 2px solid #000;
-}
-.cell:nth-child(-n+9),
-.cell:nth-child(n+73) {
-  border-top: 2px solid #000;
-}
-.cell:nth-child(n+19):nth-child(-n+27),
-.cell:nth-child(n+46):nth-child(-n+54) {
-  border-bottom: 2px solid #000;
-}
-.cell:nth-child(9n+1),
-.cell:nth-child(9n+4),
-.cell:nth-child(9n+7) {
-  border-left: 2px solid #000;
-}
-.cell:nth-child(9n) {
-  border-right: 2px solid #000;
-}
-
-    .notes {
+    .cell {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      text-align: center;
+      line-height: 40px;
+      background: white;
+      position: relative;
+      cursor: pointer;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+    }
+    .cell.fixed {
+      background: #e0e0e0;
+      font-weight: bold;
+      cursor: default;
+    }
+    .cell.highlight {
+      background: #cfe8fc;
+    }
+    .cell.same-number {
+      background: #ffe4b2;
+    }
+    .cell.notes {
       font-size: 10px;
       line-height: 13px;
       position: absolute;
@@ -66,6 +56,22 @@
       padding: 2px;
       white-space: pre-wrap;
     }
+    .cell.invalid {
+      background-color: #fbb;
+    }
+
+    /* 粗邊界 */
+    .cell:nth-child(9n+1) { border-left: 3px solid #000; }
+    .cell:nth-child(9n)   { border-right: 3px solid #000; }
+    .cell:nth-child(n+1):nth-child(-n+9),
+    .cell:nth-child(n+28):nth-child(-n+36),
+    .cell:nth-child(n+55):nth-child(-n+63) {
+      border-top: 3px solid #000;
+    }
+    .cell:nth-child(n+73):nth-child(-n+81) {
+      border-bottom: 3px solid #000;
+    }
+
     #number-pad button {
       width: 30px;
       height: 30px;
@@ -76,18 +82,6 @@
       margin-top: 10px;
       font-weight: bold;
     }
-       .back-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-        .back-button:hover {
-            background-color: #388E3C;
-        }
   </style>
 </head>
 <body>
@@ -112,7 +106,7 @@
     <div id="sudoku-board"></div>
     <div id="number-pad"></div>
     <button onclick="submitGame()">提交答案</button>
-    <button onclick="location.reload()">回選擇難度</button>
+    <button onclick="location.reload()">回首頁</button>
     <div id="result-message"></div>
   </div>
 
@@ -197,7 +191,7 @@
         let backup = board[r][c];
         board[r][c] = 0;
 
-        // skip uniqueness check for simplicity (fast demo)
+        // 跳過唯一解驗證（demo用途）
         removed--;
       }
       return board;
@@ -241,7 +235,7 @@
       if (!timerStarted) startTimer();
 
       document.querySelectorAll('.cell').forEach(c => {
-        c.classList.remove("highlight", "same-number");
+        c.classList.remove("highlight", "same-number", "invalid");
       });
 
       let r = parseInt(cell.dataset.row);
@@ -263,6 +257,8 @@
       let r = parseInt(selectedCell.dataset.row);
       let c = parseInt(selectedCell.dataset.col);
 
+      document.querySelectorAll('.cell').forEach(cell => cell.classList.remove("invalid"));
+
       if (notesMode) {
         if (!selectedCell.querySelector('.notes')) {
           let div = document.createElement('div');
@@ -282,8 +278,22 @@
       } else {
         board[r][c] = num;
         selectedCell.textContent = num;
-        selectedCell.classList.remove("notes");
         selectedCell.innerHTML = num;
+
+        // 驗證是否有重複
+        let hasConflict = false;
+        document.querySelectorAll('.cell').forEach(cell => {
+          let row = parseInt(cell.dataset.row);
+          let col = parseInt(cell.dataset.col);
+          if (cell !== selectedCell && cell.textContent == num) {
+            if (row === r || col === c || (Math.floor(row/3) === Math.floor(r/3) && Math.floor(col/3) === Math.floor(c/3))) {
+              cell.classList.add("invalid");
+              hasConflict = true;
+            }
+          }
+        });
+
+        if (hasConflict) selectedCell.classList.add("invalid");
       }
     }
 
@@ -296,7 +306,7 @@
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
           if (board[r][c] !== solution[r][c]) {
-            document.getElementById('result-message').textContent = "❌ 答錯囉！請檢查紅色格子";
+            document.getElementById('result-message').textContent = "❌出現重複！請檢查紅色格子";
             document.querySelectorAll('.cell').forEach(cell => {
               if (parseInt(cell.dataset.row) === r && parseInt(cell.dataset.col) === c) {
                 cell.style.background = "#ffcccc";
@@ -349,6 +359,5 @@
       enterNumber(parseInt(e.key));
     });
   </script>
-      <a href="index.html" class="back-button">回首頁</a>
 </body>
 </html>
