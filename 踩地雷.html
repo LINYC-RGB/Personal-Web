@@ -54,7 +54,7 @@
 <body>
   <h1>Minesweeper</h1>
   <div id="instructions">
-    玩家可自行設定範圍及地雷數，<br>
+    玩家可自訂遊玩區域大小、地雷數。<br>
     每個數字代表其周圍8格範圍內的地雷數，<br>
     對空格按下滑鼠右鍵可標記地雷。<br>
     若按下0則會自動展開連續的0區域以及周圍的數字格子。
@@ -68,7 +68,7 @@
   <div id="mine-count">Mines left: <span id="mine-counter">0</span></div>
   <div id="board"></div>
   <div id="home">
-    <a href="/">← 回首頁</a>
+    <a href="index.html">回首頁</a>
   </div>
 
   <script>
@@ -76,6 +76,8 @@
     let mineLocations = new Set();
     let flaggedCells = new Set();
     let rows = 10, cols = 10, mineCount = 10;
+    let firstClick = true;
+    let revealedCount = 0;
 
     function startGame() {
       rows = Math.min(30, parseInt(document.getElementById('rows').value));
@@ -85,6 +87,8 @@
       mineLocations.clear();
       flaggedCells.clear();
       board = [];
+      firstClick = true;
+      revealedCount = 0;
       createBoard();
       placeMines();
       renderBoard();
@@ -97,16 +101,26 @@
       board = new Array(rows).fill().map(() => new Array(cols).fill().map(() => ({ revealed: false, mine: false, number: 0 })));
     }
 
-    function placeMines() {
+    function placeMines(excludeR = -1, excludeC = -1) {
+      mineLocations.clear();
       let placed = 0;
       while (placed < mineCount) {
         const r = Math.floor(Math.random() * rows);
         const c = Math.floor(Math.random() * cols);
-        if (!board[r][c].mine) {
+        const key = `${r},${c}`;
+        if (!board[r][c].mine && (r !== excludeR || c !== excludeC)) {
           board[r][c].mine = true;
-          mineLocations.add(`${r},${c}`);
+          mineLocations.add(key);
           placed++;
           updateNumbers(r, c);
+        }
+      }
+    }
+
+    function clearNumbers() {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          board[r][c].number = 0;
         }
       }
     }
@@ -158,7 +172,17 @@
     function revealCell(cell) {
       const r = parseInt(cell.dataset.row);
       const c = parseInt(cell.dataset.col);
+
       if (board[r][c].revealed || flaggedCells.has(`${r},${c}`)) return;
+
+      if (firstClick) {
+        if (board[r][c].mine) {
+          clearBoardMines();
+          placeMines(r, c);
+        }
+        firstClick = false;
+      }
+
       if (board[r][c].mine) {
         cell.classList.add('revealed');
         cell.textContent = "💣";
@@ -166,7 +190,18 @@
         revealAll();
         return;
       }
+
       floodReveal(r, c);
+      checkWin();
+    }
+
+    function clearBoardMines() {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          board[r][c].mine = false;
+        }
+      }
+      clearNumbers();
     }
 
     function floodReveal(r, c) {
@@ -182,6 +217,7 @@
         if (!cell || board[cr][cc].revealed) continue;
 
         board[cr][cc].revealed = true;
+        revealedCount++;
         cell.classList.add('revealed');
         cell.textContent = board[cr][cc].number > 0 ? board[cr][cc].number : '';
         visited.add(key);
@@ -205,6 +241,14 @@
           cell.classList.add('revealed');
           cell.textContent = '💣';
         }
+      }
+    }
+
+    function checkWin() {
+      const totalSafe = rows * cols - mineCount;
+      if (revealedCount === totalSafe) {
+        alert("成功排雷！");
+        revealAll();
       }
     }
 
