@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Minesweeper</title>
+  <title>踩地雷</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -54,14 +54,15 @@
 <body>
   <h1>Minesweeper</h1>
   <div id="instructions">
+    玩家可自行設定範圍及地雷數，<br>
     每個數字代表其周圍8格範圍內的地雷數，<br>
     對空格按下滑鼠右鍵可標記地雷。<br>
     若按下0則會自動展開連續的0區域以及周圍的數字格子。
   </div>
   <div id="controls">
-    Rows: <input type="number" id="rows" value="10" min="1" max="30" />
-    Cols: <input type="number" id="cols" value="10" min="1" max="30" />
-    Mines: <input type="number" id="mines" value="10" min="1" />
+    Rows: <input type="number" id="列數" value="10" min="1" max="30" />
+    Cols: <input type="number" id="行數" value="10" min="1" max="30" />
+    Mines: <input type="number" id="地雷數" value="10" min="1" />
     <button onclick="startGame()">Start New Game</button>
   </div>
   <div id="mine-count">Mines left: <span id="mine-counter">0</span></div>
