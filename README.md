@@ -23,10 +23,17 @@
             <div class="button-container">
                 <a class="link-button" href="python.html"> 【基礎Python】 </a>
                 <a class="link-button" href="tools.html"> 【基礎C++】 </a>
-                <a class="link-button" href="linux.html"> 【基礎Linux指令】 </a>
-                <a class="link-button" href="ML.html"> 【基礎機器學習】 </a>
-                <a class="link-button" href="tools.html"> 【資料結構(範例程式)】 </a>
-                <a class="link-button" href="tools.html"> 【一些其他的怪東西】 </a>
+                <a class="link-button" href="linux.html"> 【基礎Linux】 </a>
+                <a class="link-button" href="ML.html"> 【基礎ML】 </a>
+
+            </div>
+        </section>
+
+          <section>
+            <h2>My Side Project</h2>
+            <div class="button-container">
+                <a class="link-button" href="key.html"> 【密碼強度檢查器】 </a>
+
             </div>
         </section>
 
