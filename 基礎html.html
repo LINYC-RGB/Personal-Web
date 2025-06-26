@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>基礎 HTML 語法教學</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    h2 {
+      color: #336699;
+    }
+    code {
+      background-color: #f4f4f4;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    pre {
+      background-color: #f9f9f9;
+      border-left: 4px solid #ccc;
+      padding: 10px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>基礎 HTML 語法教學</h1>
+
+  <h2>🔹 HTML 基本結構</h2>
+  <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;我的第一個網頁&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;歡迎來到我的網站&lt;/h1&gt;
+  &lt;p&gt;這是一段段落。&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+  <p>這是 HTML5 文件的基本架構。</p>
+
+  <h2>🔹 標題（<code>&lt;h1&gt; ~ &lt;h6&gt;</code>）</h2>
+  <pre><code>&lt;h1&gt;標題1&lt;/h1&gt;
+&lt;h2&gt;標題2&lt;/h2&gt;</code></pre>
+
+  <h2>🔹 段落（<code>&lt;p&gt;</code>）</h2>
+  <pre><code>&lt;p&gt;這是一段文字內容。&lt;/p&gt;</code></pre>
+
+  <h2>🔹 超連結（<code>&lt;a&gt;</code>）</h2>
+  <pre><code>&lt;a href="https://example.com"&gt;前往 Example 網站&lt;/a&gt;</code></pre>
+
+  <h2>🔹 圖片（<code>&lt;img&gt;</code>）</h2>
+  <pre><code>&lt;img src="image.jpg" alt="示意圖片" width="300"&gt;</code></pre>
+
+  <h2>🔹 清單（列表）</h2>
+  <p>無序清單：</p>
+  <pre><code>&lt;ul&gt;
+  &lt;li&gt;蘋果&lt;/li&gt;
+  &lt;li&gt;香蕉&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+  <p>有序清單：</p>
+  <pre><code>&lt;ol&gt;
+  &lt;li&gt;第一步&lt;/li&gt;
+  &lt;li&gt;第二步&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+
+  <h2>🔹 表格（<code>&lt;table&gt;</code>）</h2>
+  <pre><code>&lt;table border="1"&gt;
+  &lt;tr&gt;
+    &lt;th&gt;姓名&lt;/th&gt;
+    &lt;th&gt;年齡&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;小明&lt;/td&gt;
+    &lt;td&gt;20&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+
+  <h2>🔹 表單（<code>&lt;form&gt;</code>）</h2>
+  <pre><code>&lt;form action="/submit" method="post"&gt;
+  &lt;label for="name"&gt;姓名：&lt;/label&gt;
+  &lt;input type="text" id="name" name="name"&gt;&lt;br&gt;
+  &lt;input type="submit" value="送出"&gt;
+&lt;/form&gt;</code></pre>
+
+  <h2>🔹 文字樣式</h2>
+  <pre><code>&lt;b&gt;粗體&lt;/b&gt;
+&lt;i&gt;斜體&lt;/i&gt;
+&lt;u&gt;底線&lt;/u&gt;
+&lt;br&gt;  &lt;!-- 換行 --&gt;
+</code></pre>
+
+</body>
+</html>
